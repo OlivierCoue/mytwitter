@@ -66,7 +66,7 @@ class UserTest extends TestCase
         $this->assertTrue($user == User\check_auth_id($uid, "new password"));
         return $uid;
     }
-    
+
     /**
      * @depends testChangePassword
      */
@@ -99,7 +99,7 @@ class UserTest extends TestCase
             $this->assertEquals(1, count($r));
             $this->assertEquals($r[0], $u);
         }
-        
+
         return $users;
     }
 
@@ -140,7 +140,7 @@ class UserTest extends TestCase
     /**
      * @depends testFollow
      */
-    public function testDestroy($users) 
+    public function testDestroy($users)
     {
         $this->assertTrue(User\destroy($users[0]->id));
         $l = User\list_all();

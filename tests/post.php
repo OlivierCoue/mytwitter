@@ -23,30 +23,20 @@ class PostTest extends TestCase
         );
         self::$users = User\list_all();
     }
-
     public function testCreate()
     {
         $uid = self::$users[0]->id;
         $pid = Post\create($uid, "This is a sample text");
         $this->assertTrue($pid !== null);
         $post = Post\get($pid);
-<<<<<<< HEAD
         $this->assertEquals($post->author->id, $uid);
-=======
-        $this->assertEquals($post->author->id, $pid);
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
         $this->assertEquals($post->text, "This is a sample text");
         $this->assertEquals($post->id, $pid);
         return $pid;
     }
-
     /**
      * @depends testCreate
-<<<<<<< HEAD
      */
-=======
-     */  
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testRespond($pid)
     {
         $uid = self::$users[1]->id;
@@ -55,14 +45,9 @@ class PostTest extends TestCase
         $this->assertTrue($post->responds_to == Post\get($pid));
         $this->assertTrue(Post\get_responses($pid)[0] == Post\get($new_pid));
     }
-
     /**
      * @depends testRespond
-<<<<<<< HEAD
      */
-=======
-     */  
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testMentionUser()
     {
         $uid = self::$users[0]->id;
@@ -72,14 +57,9 @@ class PostTest extends TestCase
         $this->assertTrue(self::$users[1] == $m[0]);
         return $pid;
     }
-
     /**
      * @depends testRespond
-<<<<<<< HEAD
      */
-=======
-     */  
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testLike($pid)
     {
         $this->assertTrue(User\like(self::$users[1]->id, $pid));
@@ -90,7 +70,6 @@ class PostTest extends TestCase
         $post = Post\get_with_joins($pid);
         $this->assertEmpty($post->likes);
     }
-
     /**
      * @depends testLike
      */
@@ -105,14 +84,9 @@ class PostTest extends TestCase
         $this->assertEquals(count($s), 1);
         $this->assertEquals($s[0]->id, $pid2);
     }
-
     /**
      * @depends testSearch
-<<<<<<< HEAD
      */
-=======
-     */      
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testDestroy()
     {
         foreach(Post\list_all() as $post)
@@ -126,14 +100,9 @@ class PostTest extends TestCase
         $this->assertEquals(count($posts), 1);
         $this->assertEquals($posts[0]->id, $pid2);
     }
-
     /**
      * @depends testDestroy
-<<<<<<< HEAD
      */
-=======
-     */      
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testLists()
     {
         foreach(Post\list_all() as $post)
@@ -149,7 +118,6 @@ class PostTest extends TestCase
         $this->assertEquals($posts[0]->id, $pid1);
         $this->assertEquals($posts[1]->id, $pid2);
     }
-
     public static function tearDownAfterClass()
     {
         \Db::flush();

@@ -43,15 +43,23 @@ function get($id) {
  * @warning the responds_to attribute is either null (if the post is not a response) or a post object
  */
 function get_with_joins($id) {
-    return (object) array(
-        "id" => 1337,
-        "text" => "Ima writing a post !",
-        "date" => new \DateTime('2011-01-01T15:03:01'),
-        "author" => \Model\User\get(2),
-        "likes" => [],
-        "hashtags" => [],
-        "responds_to" => null
-    );
+    $db = Db::dbc();
+    try{
+        $post = null;
+        $sql = 'SELECT * FROM tweet WHERE id_tweet = :id';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':id'=>$id));
+        while ($row = $sth->fetch()) {
+            $post = rowToObject($row);
+            $post->responds_to = get($row['ID_TWEET_ANSWERTO']);
+            $post->likes = [];
+            $post->hashtags = [];
+        }
+        return $post;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -69,9 +77,9 @@ function get_with_joins($id) {
 function create($author_id, $text, $response_to=null) {
     $db = Db::dbc();
     try{
-        $sql = 'INSERT INTO tweet (text, datepublished, id_user) VALUES(:text, now(), :author_id)';
+        $sql = 'INSERT INTO tweet (text, datepublished, id_user, id_tweet_answerto) VALUES(:text, now(), :author_id, :response_to)';
         $sth = $db->prepare($sql);
-        $sth->execute(array(':text'=>$text, ':author_id'=>$author_id));
+        $sth->execute(array(':text'=>$text, ':author_id'=>$author_id, ':response_to'=>$response_to));
         return $db->lastInsertId();
     }catch(\PDOException $e){
         print $e->getMessage();
@@ -179,7 +187,20 @@ function get_likes($pid) {
  * @return the posts objects which are a response to the actual post
  */
 function get_responses($pid) {
-    return [get(2)];
+    $db = Db::dbc();
+    try{
+        $posts = [];
+        $sql = 'SELECT * FROM tweet WHERE id_tweet_answerto = :id';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':id'=>$pid));
+        while ($row = $sth->fetch()) {
+            array_push($posts, rowToObject($row));
+        }
+        return $posts;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**

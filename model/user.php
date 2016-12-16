@@ -14,7 +14,6 @@ use \PDOException;
  * @return an object containing the attributes of the user or null if error or the user doesn't exist
  */
 function get($id) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $user = null;
@@ -29,16 +28,6 @@ function get($id) {
         print $e->getMessage();
         return null;
     }
-=======
-    return (object) array(
-        "id" => 1337,
-        "username" => "yrlgtm",
-        "name" => "User 1",
-        "password" => "hashed",
-        "email" => "yrlgtm@gmail.com",
-        "avatar" => "" 
-    );
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -53,7 +42,6 @@ function get($id) {
  * @warning this function hashes the password
  */
 function create($username, $name, $password, $email, $avatar_path) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $sql = 'INSERT INTO user (username, name, password, email, avatarpath) VALUES(:username, :name, :password, :email, :avatar_path)';
@@ -64,9 +52,6 @@ function create($username, $name, $password, $email, $avatar_path) {
         print $e->getMessage();
         return null;
     }
-=======
-    return 1337;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -79,7 +64,6 @@ function create($username, $name, $password, $email, $avatar_path) {
  * @warning this function doesn't check whether a user with a similar username exists
  */
 function modify($uid, $username, $name, $email) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $sql = 'UPDATE user SET username = :username, name = :name, email = :email WHERE id_user = :id';
@@ -90,9 +74,6 @@ function modify($uid, $username, $name, $email) {
         print $e->getMessage();
         return false;
     }
-=======
-    return false;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -103,7 +84,6 @@ function modify($uid, $username, $name, $email) {
  * @warning this function hashes the password
  */
 function change_password($uid, $new_password) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $sql = 'UPDATE user SET password = :password WHERE id_user = :id';
@@ -114,9 +94,6 @@ function change_password($uid, $new_password) {
         print $e->getMessage();
         return false;
     }
-=======
-    return false;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -126,7 +103,6 @@ function change_password($uid, $new_password) {
  * @return true if everything went fine, false else
  */
 function change_avatar($uid, $avatar_path) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $sql = 'UPDATE user SET avatarpath = :avatar_path WHERE id_user = :id';
@@ -137,9 +113,6 @@ function change_avatar($uid, $avatar_path) {
         print $e->getMessage();
         return false;
     }
-=======
-    return false;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -148,7 +121,6 @@ function change_avatar($uid, $avatar_path) {
  * @return true if the user has been correctly deleted, false else
  */
 function destroy($id) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $sql = 'DELETE FROM user WHERE id_user = :id';
@@ -159,9 +131,6 @@ function destroy($id) {
         print $e->getMessage();
         return false;
     }
-=======
-    return false;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -170,11 +139,7 @@ function destroy($id) {
  * @return the hashed password
  */
 function hash_password($password) {
-<<<<<<< HEAD
     return md5($password);
-=======
-    return $password;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -183,7 +148,6 @@ function hash_password($password) {
  * @return an array of find objects
  */
 function search($string) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $users = [];
@@ -198,9 +162,6 @@ function search($string) {
         print $e->getMessage();
         return null;
     }
-=======
-    return [get(1)];
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -208,7 +169,6 @@ function search($string) {
  * @return an array of the objects of every users
  */
 function list_all() {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $users = [];
@@ -223,9 +183,6 @@ function list_all() {
         print $e->getMessage();
         return null;
     }
-=======
-    return [get(1)];
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -234,7 +191,6 @@ function list_all() {
  * @return the user object or null if the user doesn't exist
  */
 function get_by_username($username) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $user = null;
@@ -249,9 +205,6 @@ function get_by_username($username) {
         print $e->getMessage();
         return null;
     }
-=======
-    return get(1);
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -260,7 +213,6 @@ function get_by_username($username) {
  * @return a list of users objects
  */
 function get_followers($uid) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $users = [];
@@ -275,9 +227,6 @@ function get_followers($uid) {
         print $e->getMessage();
         return null;
     }
-=======
-    return [get(2)];
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -286,7 +235,6 @@ function get_followers($uid) {
  * @return a list of users objects
  */
 function get_followings($uid) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $users = [];
@@ -301,9 +249,6 @@ function get_followings($uid) {
         print $e->getMessage();
         return null;
     }
-=======
-    return [get(2)];
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -324,7 +269,6 @@ function get_stats($uid) {
  * @param username the user's username
  * @param password the user's password
  * @return the user object or null if authentification failed
-<<<<<<< HEAD
  * @warning this function must perform the password hashing
  */
 function check_auth($username, $password) {
@@ -333,12 +277,6 @@ function check_auth($username, $password) {
         return $user;
     else
         return null;
-=======
- * @warning this function must perform the password hashing   
- */
-function check_auth($username, $password) {
-    return null;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -348,15 +286,11 @@ function check_auth($username, $password) {
  * @return the user object or null if authentification failed
  */
 function check_auth_id($id, $password) {
-<<<<<<< HEAD
     $user = get($id);
     if($user && $user->password == md5($password))
         return $user;
     else
         return null;
-=======
-    return null;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -366,7 +300,6 @@ function check_auth_id($id, $password) {
  * @return true if the user has been followed, false else
  */
 function follow($id, $id_to_follow) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $sql = 'INSERT INTO follows (id_user_follower, id_user_followed) VALUES(:id, :id_to_follow)';
@@ -377,9 +310,6 @@ function follow($id, $id_to_follow) {
         print $e->getMessage();
         return false;
     }
-=======
-    return false;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -389,7 +319,6 @@ function follow($id, $id_to_follow) {
  * @return true if the user has been unfollowed, false else
  */
 function unfollow($id, $id_to_unfollow) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $sql = 'DELETE FROM follows WHERE id_user_follower = :id AND id_user_followed = :id_to_unfollow';
@@ -413,8 +342,3 @@ function rowToObject($row){
     );
     return $user;
 }
-=======
-    return false;
-}
-
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375

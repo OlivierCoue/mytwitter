@@ -16,7 +16,6 @@ use \PDOException;
  * @warning the date attribute is a DateTime object
  */
 function get($id) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $post = null;
@@ -31,14 +30,6 @@ function get($id) {
         print $e->getMessage();
         return null;
     }
-=======
-    return (object) array(
-        "id" => 1337,
-        "text" => "Text",
-        "date" => new \DateTime('2011-01-01T15:03:01'),
-        "author" => \Model\User\get(2)
-    );
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -62,11 +53,7 @@ function get_with_joins($id) {
         "responds_to" => null
     );
 }
-<<<<<<< HEAD
 
-=======
- 
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 /**
  * Create a post in db
  * @param author_id the author user's id
@@ -80,7 +67,6 @@ function get_with_joins($id) {
  * @warning this function takes care to rollback if one of the queries comes to fail.
  */
 function create($author_id, $text, $response_to=null) {
-<<<<<<< HEAD
     $db = Db::dbc();
     try{
         $sql = 'INSERT INTO tweet (text, datepublished, id_user) VALUES(:text, now(), :author_id)';
@@ -91,9 +77,6 @@ function create($author_id, $text, $response_to=null) {
         print $e->getMessage();
         return null;
     }
-=======
-    return 1337;
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
 }
 
 /**
@@ -229,7 +212,6 @@ function unlike($uid, $pid) {
     return false;
 }
 
-<<<<<<< HEAD
 function rowToObject($row){
     $post = (object) array(
         "id" => $row['ID_TWEET'],
@@ -240,5 +222,3 @@ function rowToObject($row){
     return $post;
 }
 
-=======
->>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375

@@ -2,7 +2,11 @@
     "require": {
         "phpunit/phpunit": "5.5.*",
         "phpdocumentor/phpdocumentor": "2.*",
+<<<<<<< HEAD
         "symfony/yaml": "^3.2",
         "phpunit/phpunit": "^5.7.3"
+=======
+        "symfony/yaml": "^3.2"
+>>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     }
 }

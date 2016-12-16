@@ -30,7 +30,11 @@ class PostTest extends TestCase
         $pid = Post\create($uid, "This is a sample text");
         $this->assertTrue($pid !== null);
         $post = Post\get($pid);
+<<<<<<< HEAD
         $this->assertEquals($post->author->id, $uid);
+=======
+        $this->assertEquals($post->author->id, $pid);
+>>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
         $this->assertEquals($post->text, "This is a sample text");
         $this->assertEquals($post->id, $pid);
         return $pid;
@@ -38,7 +42,11 @@ class PostTest extends TestCase
 
     /**
      * @depends testCreate
+<<<<<<< HEAD
      */
+=======
+     */  
+>>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testRespond($pid)
     {
         $uid = self::$users[1]->id;
@@ -50,7 +58,11 @@ class PostTest extends TestCase
 
     /**
      * @depends testRespond
+<<<<<<< HEAD
      */
+=======
+     */  
+>>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testMentionUser()
     {
         $uid = self::$users[0]->id;
@@ -63,7 +75,11 @@ class PostTest extends TestCase
 
     /**
      * @depends testRespond
+<<<<<<< HEAD
      */
+=======
+     */  
+>>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testLike($pid)
     {
         $this->assertTrue(User\like(self::$users[1]->id, $pid));
@@ -92,7 +108,11 @@ class PostTest extends TestCase
 
     /**
      * @depends testSearch
+<<<<<<< HEAD
      */
+=======
+     */      
+>>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testDestroy()
     {
         foreach(Post\list_all() as $post)
@@ -109,7 +129,11 @@ class PostTest extends TestCase
 
     /**
      * @depends testDestroy
+<<<<<<< HEAD
      */
+=======
+     */      
+>>>>>>> 88a3b0d9dfe40693d8379f65fc2f500da6b15375
     public function testLists()
     {
         foreach(Post\list_all() as $post)

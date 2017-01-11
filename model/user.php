@@ -151,9 +151,9 @@ function search($string) {
     $db = Db::dbc();
     try{
         $users = [];
-        $sql = 'SELECT * FROM user WHERE username = :username OR name = :name';
+        $sql = "SELECT * FROM user WHERE username LIKE '%".$string."%' OR name LIKE '%".$string."%'";
         $sth = $db->prepare($sql);
-        $sth->execute(array(':username'=>$string, ':name'=>$string));
+        $sth->execute(array());
         while ($row = $sth->fetch()) {
             array_push($users, rowToObject($row));
         }
@@ -273,7 +273,7 @@ function get_stats($uid) {
  */
 function check_auth($username, $password) {
     $user = get_by_username($username);
-    if($user->password == md5($password))
+    if($user && $user->password == md5($password))
         return $user;
     else
         return null;
@@ -287,7 +287,7 @@ function check_auth($username, $password) {
  */
 function check_auth_id($id, $password) {
     $user = get($id);
-    if($user && $user->password == md5($password))
+    if($user && $user->password == $password)
         return $user;
     else
         return null;

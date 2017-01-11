@@ -52,7 +52,7 @@ function get_with_joins($id) {
         while ($row = $sth->fetch()) {
             $post = rowToObject($row);
             $post->responds_to = get($row['ID_TWEET_ANSWERTO']);
-            $post->likes = [];
+            $post->likes = get_likes($post->id);
             $post->hashtags = [];
         }
         return $post;
@@ -80,7 +80,22 @@ function create($author_id, $text, $response_to=null) {
         $sql = 'INSERT INTO tweet (text, datepublished, id_user, id_tweet_answerto) VALUES(:text, now(), :author_id, :response_to)';
         $sth = $db->prepare($sql);
         $sth->execute(array(':text'=>$text, ':author_id'=>$author_id, ':response_to'=>$response_to));
-        return $db->lastInsertId();
+
+        $postId = $db->lastInsertId();
+
+        $userMentionned = extract_mentions($text);              
+        foreach ($userMentionned as $username) {            
+            $user = \Model\User\get_by_username(ltrim($username, '@'));            
+            if($user && $user->id)                    
+                mention_user($postId,    $user->id);
+        }
+
+        $hashtags = extract_hashtags($text);        
+        foreach ($hashtags as $hashtag) {            
+            \Model\Hashtag\attach($postId, $hashtag);            
+        }
+
+        return $postId;
     }catch(\PDOException $e){
         print $e->getMessage();
         return null;
@@ -93,11 +108,14 @@ function create($author_id, $text, $response_to=null) {
  * @return an array of hashtags
  */
 function extract_hashtags($text) {
-    return array_filter(
-        explode($text, " "),
-        function($c) {
-            return $c !== "" || $c[0] == "#";
-        }
+    return array_map(
+        function($el) { return substr($el, 1); },
+        array_filter(
+            explode(" ", $text),
+            function($c) {
+                return $c !== "" && $c[0] == "#";
+            }
+        )
     );
 }
 
@@ -106,12 +124,15 @@ function extract_hashtags($text) {
  * @param text the message
  * @return an array of usernames
  */
-function extract_mentions($text) {
-    return array_filter(
-        explode($text, " "),
-        function($c) {
-            return $c !== "" || $c[0] == "@";
-        }
+function extract_mentions($text) {    
+    return array_map(
+        function($el) { return substr($el, 1); },
+        array_filter(
+            explode(" ", $text),
+            function($c) {
+                return $c !== "" && $c[0] == "@";
+            }
+        )
     );
 }
 
@@ -121,8 +142,17 @@ function extract_mentions($text) {
  * @param uid the user id to mention
  * @return true if everything went ok, false else
  */
-function mention_user($pid, $uid) {
-    return false;
+function mention_user($pid, $uid) {    
+    $db = Db::dbc();
+    try{
+        $sql = 'INSERT INTO mentioned (id_user, id_tweet) VALUES(:uid, :pid)';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':pid'=>$pid, ':uid'=>$uid));
+        return true;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -131,7 +161,20 @@ function mention_user($pid, $uid) {
  * @return the array of user objects mentioned
  */
 function get_mentioned($pid) {
-    return [];
+    $db = Db::dbc();
+    try{
+        $users = [];
+        $sql = 'SELECT * FROM mentioned INNER JOIN user ON user.id_user = mentioned.id_user WHERE mentioned.id_tweet = :pid';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':pid'=>$pid));
+        while ($row = $sth->fetch()) {
+            array_push($users, \Model\User\rowToObject($row));
+        }
+        return $users;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -140,7 +183,16 @@ function get_mentioned($pid) {
  * @return true if the post has been correctly deleted, false else
  */
 function destroy($id) {
-    return false;
+    $db = Db::dbc();
+    try{
+        $sql = 'DELETE FROM tweet WHERE id_tweet = :id';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':id'=>$id));
+        return true;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return false;
+    }
 }
 
 /**
@@ -149,7 +201,20 @@ function destroy($id) {
  * @return an array of find objects
  */
 function search($string) {
-    return [get(1)];
+    $db = Db::dbc();
+    try{
+        $posts = [];
+        $sql = "SELECT * FROM tweet WHERE text LIKE '%".$string."%'";
+        $sth = $db->prepare($sql);
+        $sth->execute(array());
+        while ($row = $sth->fetch()) {
+            array_push($posts, rowToObject($row));
+        }
+        return $posts;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -158,8 +223,26 @@ function search($string) {
  * @return an array of the objects of each post
  * @warning this function does not return the passwords
  */
-function list_all($date_sorted=false) {
-    return [get(1),get(1),get(1),get(1),get(1),get(1)];
+function list_all($date_sorted=false) {    
+    $db = Db::dbc();
+    try{
+        $posts = [];
+        if($date_sorted == 'ASC')
+            $sql = 'SELECT * FROM tweet ORDER BY datepublished ASC';
+        else if($date_sorted == 'DESC')
+            $sql = 'SELECT * FROM tweet ORDER BY datepublished DESC';
+        else
+            $sql = 'SELECT * FROM tweet ORDER BY datepublished';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':date_sorted' => $date_sorted));
+        while ($row = $sth->fetch()) {
+            array_push($posts, rowToObject($row));
+        }
+        return $posts;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -169,7 +252,25 @@ function list_all($date_sorted=false) {
  * @return the list of posts objects
  */
 function list_user_posts($id, $date_sorted="DESC") {
-    return [get(1)];
+    $db = Db::dbc();
+    try{
+        $posts = [];
+        if($date_sorted == 'ASC')
+            $sql = 'SELECT * FROM tweet WHERE id_user = :id ORDER BY datepublished ASC';
+        else if($date_sorted == 'DESC')
+            $sql = 'SELECT * FROM tweet WHERE id_user = :id ORDER BY datepublished DESC';
+        else
+            $sql = 'SELECT * FROM tweet WHERE id_user = :id ORDER BY datepublished';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':id'=>$id, ':date_sorted' => $date_sorted));
+        while ($row = $sth->fetch()) {
+            array_push($posts, rowToObject($row));
+        }
+        return $posts;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -178,7 +279,20 @@ function list_user_posts($id, $date_sorted="DESC") {
  * @return the users objects who liked the post
  */
 function get_likes($pid) {
-    return [\Model\User\get(2)];
+    $db = Db::dbc();
+    try{
+        $users = [];
+        $sql = 'SELECT * FROM tweetlike NATURAL JOIN user WHERE tweetlike.id_tweet = :pid';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':pid'=>$pid));
+        while ($row = $sth->fetch()) {
+            array_push($users, \Model\User\rowToObject($row));
+        }
+        return $users;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -220,7 +334,16 @@ function get_stats($pid) {
  * @return true if the post has been liked, false else
  */
 function like($uid, $pid) {
-    return false;
+    $db = Db::dbc();
+    try{
+        $sql = 'INSERT INTO tweetlike (id_user, id_tweet, dateliked) VALUES(:uid, :pid, now())';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':pid'=>$pid, ':uid'=>$uid));
+        return true;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -230,7 +353,16 @@ function like($uid, $pid) {
  * @return true if the post has been unliked, false else
  */
 function unlike($uid, $pid) {
-    return false;
+    $db = Db::dbc();
+    try{
+        $sql = 'DELETE FROM tweetlike WHERE id_tweet = :pid AND id_user = :uid';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':pid'=>$pid, ':uid'=>$uid));
+        return true;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 function rowToObject($row){

@@ -10,6 +10,7 @@ class NotificationTest extends TestCase
     protected static $uids;
     public static function setUpBeforeClass()
     {
+        \Db::flush();
         self::$uids = [];
         self::$uids[] = User\create(
             "userpost1",
@@ -28,8 +29,8 @@ class NotificationTest extends TestCase
         );
         self::$pids = [];
         
-        self::$pids[] = Post\create($uids[0], "this is a searchid1 test");
-        self::$pids[] = Post\create($uids[1], "this searchid2 is a test");
+        self::$pids[] = Post\create(self::$uids[0], "this is a searchid1 test");
+        self::$pids[] = Post\create(self::$uids[1], "this searchid2 is a test");
     }
 
     public function testLikedNotification()
@@ -44,7 +45,7 @@ class NotificationTest extends TestCase
         $this->assertObjectHasAttribute('reading_date', $n[0]);
 
         $this->assertEquals($n[0]->reading_date, null);
-        $this->assertTrue(Notification\like_notification_seen(self::$pids[1], self::$uids[0]));
+        $this->assertTrue(Notification\liked_notification_seen(self::$pids[1], self::$uids[0]));
         $n = Notification\get_liked_notifications(self::$uids[1]);
         $this->assertNotEquals($n[0]->reading_date, null);
         
@@ -53,6 +54,9 @@ class NotificationTest extends TestCase
         $this->assertEmpty($n);
     }
 
+    /**
+     * @depends testLikedNotification
+     */  
     public function testMentionedNotification()
     {
         Post\mention_user(self::$pids[0], self::$uids[1]);
@@ -74,6 +78,9 @@ class NotificationTest extends TestCase
         $this->assertEmpty($n);
     }
 
+    /**
+     * @depends testMentionedNotification
+     */  
     public function testFollowedNotification()
     {
         User\follow(self::$uids[0], self::$uids[1]);
@@ -93,22 +100,26 @@ class NotificationTest extends TestCase
         $this->assertEmpty($n);
     }
 
+    /**
+     * @depends testFollowedNotification
+     */  
     public function testListAllNotifications()
     {
-        User\follow(self::$uids[0], self::$uids[1]);
         Post\mention_user(self::$pids[1], self::$uids[1]);
+        sleep(1);
+        User\follow(self::$uids[0], self::$uids[1]);
+        sleep(1);
         Post\like(self::$uids[0], self::$pids[1]);
         
         $n = Notification\list_all_notifications(self::$uids[1]);
         $this->assertEquals(count($n), 3);
-        $this->assertEquals($n[0]->type, "liked");
-        $this->assertEquals($n[1]->type, "mentioned");
-        $this->assertEquals($n[2]->type, "followed");
+        $this->assertEquals("mentioned", $n[2]->type);
+        $this->assertEquals("followed", $n[1]->type);
+        $this->assertEquals("liked", $n[0]->type);
     }
 
     public static function tearDownAfterClass()
     {
-        \Db::flush();
     }
 
 }

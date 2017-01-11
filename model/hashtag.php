@@ -84,7 +84,7 @@ function get_posts($hashtag_name) {
         $sth->execute(array(':hashtag_name' => $hashtag_name));
         while ($row = $sth->fetch()) {        	
             array_push($posts, \Model\Post\rowToObject($row));
-        }        
+        }
         return $posts;
     }catch(\PDOException $e){
         print $e->getMessage();

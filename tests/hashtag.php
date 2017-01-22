@@ -51,9 +51,9 @@ class HashtagTest extends TestCase
     public function testListPopularHashtags()
     {
         $l = Hashtag\list_popular_hashtags(5);
-        $this->assertEquals($l[0], "hashtag3", "list_popular_hashtags should return every hashtags sorted by popularity");
-        $this->assertEquals($l[1], "hashtag2", "list_popular_hashtags should return every hashtags sorted by popularity");
-        $this->assertEquals($l[2], "hashtag1", "list_popular_hashtags should return every hashtags sorted by popularity");
+        $this->assertEquals("hashtag3", $l[0], "list_popular_hashtags should return every hashtags sorted by popularity");
+        $this->assertEquals("hashtag2", $l[1], "list_popular_hashtags should return every hashtags sorted by popularity");
+        $this->assertEquals("hashtag1", $l[2], "list_popular_hashtags should return every hashtags sorted by popularity");
     }
 
     /**
@@ -73,7 +73,7 @@ class HashtagTest extends TestCase
     {
         $h = Hashtag\get_related_hashtags("hash", 5);
         $this->assertEquals(1, count($h), "get_related_hashtags should return an array of every related hashtags names");
-        $this->assertEquals($h[0], "tag", "get_related_hashtags should return an array of every related hashtags names");
+        $this->assertEquals("tag", $h[0], "get_related_hashtags should return an array of every related hashtags names");
     }
 
     public static function tearDownAfterClass()

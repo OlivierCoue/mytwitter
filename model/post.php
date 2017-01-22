@@ -145,7 +145,7 @@ function extract_mentions($text) {
 function mention_user($pid, $uid) {    
     $db = Db::dbc();
     try{
-        $sql = 'INSERT INTO mentioned (id_user, id_tweet) VALUES(:uid, :pid)';
+        $sql = 'INSERT INTO mentioned (id_user, id_tweet, date_created) VALUES(:uid, :pid, now())';
         $sth = $db->prepare($sql);
         $sth->execute(array(':pid'=>$pid, ':uid'=>$uid));
         return true;
@@ -336,9 +336,9 @@ function get_stats($pid) {
 function like($uid, $pid) {
     $db = Db::dbc();
     try{
-        $sql = 'INSERT INTO tweetlike (id_user, id_tweet, dateliked) VALUES(:uid, :pid, now())';
+        $sql = 'INSERT INTO tweetlike (id_user, id_tweet, date_created) VALUES(:uiddd, :pid, now())';
         $sth = $db->prepare($sql);
-        $sth->execute(array(':pid'=>$pid, ':uid'=>$uid));
+        $sth->execute(array(':uiddd'=>$uid, ':pid'=>$pid));
         return true;
     }catch(\PDOException $e){
         print $e->getMessage();

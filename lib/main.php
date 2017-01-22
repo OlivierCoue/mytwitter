@@ -10,6 +10,7 @@ function require_wildcard($w) {
 require "session.php";
 require "../vendor/autoload.php";
 require "db.php";
+require "http.php";
 
 Db::connect();
 

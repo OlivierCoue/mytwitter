@@ -18,13 +18,28 @@ use \PDOException;
  * @warning the reading_date attribute is either a DateTime object or null (if it hasn't been read)
  */
 function get_liked_notifications($uid) {
-    return [(object) array(
-        "type" => "liked",
-        "post" => \Model\Post\get(1),
-        "liked_by" => \Model\User\get(3),
-        "date" => new \DateTime("NOW"),
-        "reading_date" => new \DateTime("NOW")
-    )];
+    $db = Db::dbc();
+    try{
+        $notifications = [];
+        $sql = 'SELECT tweetlike.* FROM tweetlike INNER JOIN tweet USING(id_tweet) WHERE tweet.id_user = :uid';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':uid'=>$uid));
+        while ($row = $sth->fetch()) {
+            $date =  \DateTime::createFromFormat('Y-m-j H:i:s', $row['DATE_CREATED']);
+            $date_readed =  ($row['DATE_READED']) ? \DateTime::createFromFormat('Y-m-j H:i:s', $row['DATE_READED']) : null;
+            array_push($notifications, (object) array(
+                "type" => "liked",
+                "post" => \Model\Post\get($row['ID_TWEET']),
+                "liked_by" => \Model\User\get($row['ID_USER']),
+                "date" => $date,
+                "reading_date" => $date_readed
+            ));
+        }        
+        return $notifications;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -34,7 +49,16 @@ function get_liked_notifications($uid) {
  * @return true if everything went ok, false else
  */
 function liked_notification_seen($pid, $uid) {
-    return false;
+    $db = Db::dbc();
+    try{
+        $sql = 'UPDATE tweetlike SET date_readed = now() WHERE id_user = :uid AND id_tweet = :pid';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':uid'=>$uid, ':pid'=>$pid));
+        return true;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return false;
+    }
 }
 
 /**
@@ -46,13 +70,33 @@ function liked_notification_seen($pid, $uid) {
  * @warning the reading_date object is either a DateTime object or null (if it hasn't been read)
  */
 function get_mentioned_notifications($uid) {
-    return [(object) array(
-        "type" => "mentioned",
-        "post" => \Model\Post\get(1),
-        "mentioned_by" => \Model\User\get(3),
-        "date" => new \DateTime("NOW"),
-        "reading_date" => null
-    )];
+    $db = Db::dbc();
+    try{
+        $notifications = [];
+        $sql = 'SELECT * FROM mentioned WHERE id_user = :uid';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':uid'=>$uid));
+        while ($row = $sth->fetch()) {
+            if(isset($row['ID_TWEET'])){
+                $post = \Model\Post\get($row['ID_TWEET']);
+                if(is_object($post)){
+                    $date =  \DateTime::createFromFormat('Y-m-j H:i:s', $row['DATE_CREATED']);
+                    $date_readed =  ($row['DATE_READED']) ? \DateTime::createFromFormat('Y-m-j H:i:s', $row['DATE_READED']) : null;    
+                    array_push($notifications, (object) array(
+                        "type" => "mentioned",
+                        "post" => $post,
+                        "mentioned_by" => $post->author,
+                        "date" => $date,
+                        "reading_date" => $date_readed
+                    ));
+                }
+            }
+        }        
+        return $notifications;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -62,7 +106,16 @@ function get_mentioned_notifications($uid) {
  * @return true if everything went ok, false else
  */
 function mentioned_notification_seen($uid, $pid) {
-    return false;
+    $db = Db::dbc();
+    try{
+        $sql = 'UPDATE mentioned SET date_readed = now() WHERE id_user = :uid AND id_tweet = :pid';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':uid'=>$uid, ':pid'=>$pid));
+        return true;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return false;
+    }
 }
 
 /**
@@ -73,12 +126,27 @@ function mentioned_notification_seen($uid, $pid) {
  * @warning the reading_date object is either a DateTime object or null (if it hasn't been read)
  */
 function get_followed_notifications($uid) {
-    return [(object) array(
-        "type" => "followed",
-        "user" => \Model\User\get(1),
-        "date" => new \DateTime("NOW"),
-        "reading_date" => new \DateTime("NOW")
-    )];
+    $db = Db::dbc();
+    try{
+        $notifications = [];
+        $sql = 'SELECT * FROM follows WHERE id_user_followed = :uid';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':uid'=>$uid));
+        while ($row = $sth->fetch()) {      
+            $date =  \DateTime::createFromFormat('Y-m-j H:i:s', $row['DATE_CREATED']);
+            $date_readed =  ($row['DATE_READED']) ? \DateTime::createFromFormat('Y-m-j H:i:s', $row['DATE_READED']) : null;
+            array_push($notifications, (object) array(
+                "type" => "followed",                
+                "user" => \Model\User\get($row['ID_USER_FOLLOWER']),
+                "date" => $date,
+                "reading_date" => $date_readed
+            ));
+        }        
+        return $notifications;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return null;
+    }
 }
 
 /**
@@ -88,7 +156,16 @@ function get_followed_notifications($uid) {
  * @return true if everything went ok, false else
  */
 function followed_notification_seen($followed_id, $follower_id) {
-    return false;
+    $db = Db::dbc();
+    try{
+        $sql = 'UPDATE follows SET date_readed = now() WHERE id_user_follower = :uid1 AND id_user_followed = :uid2';
+        $sth = $db->prepare($sql);
+        $sth->execute(array(':uid1'=>$follower_id, ':uid2'=>$followed_id));
+        return true;
+    }catch(\PDOException $e){
+        print $e->getMessage();
+        return false;
+    }
 }
 
 /**
@@ -97,13 +174,13 @@ function followed_notification_seen($followed_id, $follower_id) {
  * @return a sorted list of every notifications objects
  */
 function list_all_notifications($uid) {
-    $ary = array_merge(get_liked_notifications($uid), get_followed_notifications($uid), get_mentioned_notifications($uid));
+    $ary = array_merge(get_liked_notifications($uid), get_followed_notifications($uid), get_mentioned_notifications($uid));    
     usort(
         $ary,
         function($a, $b) {
-            return $b->date->format('U') - $a->date->format('U');
+            return $a->date->format('Y-m-j H:i:s') - $b->date->format('Y-m-j H:i:s');
         }
-    );
+    );    
     return $ary;
 }
 

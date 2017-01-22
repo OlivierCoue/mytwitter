@@ -23,16 +23,17 @@ function post($form) {
     $user = \Session\get_user();
     if(!$user) {
         header($_SERVER["SERVER_PROTOCOL"]." 403 Forbidden", true, 403);
-        return;
-    }
-    extract($form);
-    if($pid = \Model\Post\create($user->id, $text)) {
-        \Session\set_success("Your twirp has been published.");
-        header("Location: post.php?id=".$pid);
     }
     else {
-        \Session\set_error("An error occured while trying to publish your twirp.");
-        header("Location: index.php");
+        extract($form);
+        if($pid = \Model\Post\create($user->id, $text)) {
+            \Session\set_success("Your twirp has been published.");
+            header("Location: post.php?id=".$pid);
+        }
+        else {
+            \Session\set_error("An error occured while trying to publish your twirp.");
+            header("Location: index.php");
+        }
     }
 }
 

@@ -302,7 +302,7 @@ function check_auth_id($id, $password) {
 function follow($id, $id_to_follow) {
     $db = Db::dbc();
     try{
-        $sql = 'INSERT INTO follows (id_user_follower, id_user_followed) VALUES(:id, :id_to_follow)';
+        $sql = 'INSERT INTO follows (id_user_follower, id_user_followed, date_created) VALUES(:id, :id_to_follow, NOW())';
         $sth = $db->prepare($sql);
         $sth->execute(array(':id'=>$id, ':id_to_follow'=>$id_to_follow));
         return true;

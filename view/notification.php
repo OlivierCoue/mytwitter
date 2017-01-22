@@ -13,11 +13,11 @@ main_template(get_defined_vars(), function($vars) {
                         foreach($notifications as $notification) {
                             $new_class = $notification->reading_date ? "" : " notification-new";
                             switch($notification->type) {
-                                case "like":
+                                case "liked":
                                     ?>
                     <div class="inner-block notification notification-like<?php echo $new_class; ?>">
                         <div class="notification-content"><?php echo htmlspecialchars($notification->liked_by->name); ?> liked a <a href="post.php?id=<?php echo htmlspecialchars($notification->post->id); ?>">twirp</a> you wrote</div>
-                        <div class="notification-users"><a href="user.php?username=<?php echo htmlspecialchars($notification->liked_by->username); ?>"><img src="images/avatar.jpg" width="32px" height="32px"/></a></div>
+                        <div class="notification-users"><a href="user.php?username=<?php echo htmlspecialchars($notification->liked_by->username); ?>"><img src="<?php echo htmlspecialchars($notification->liked_by->avatar); ?>" width="32px" height="32px"/></a></div>
                     </div>
                                     <?php
                                 break;
@@ -28,7 +28,7 @@ main_template(get_defined_vars(), function($vars) {
                                     ?>
                     <div class="inner-block notification notification-followed<?php echo $new_class; ?>">
                         <div class="notification-content"><?php echo htmlspecialchars($notification->user->name); ?> is following you</div>
-                        <div class="notification-users"><a href="user.php?username=<?php echo htmlspecialchars($notification->user->username); ?>"><img src="images/avatar.jpg" width="32px" height="32px"/></a></div>
+                        <div class="notification-users"><a href="user.php?username=<?php echo htmlspecialchars($notification->user->username); ?>"><img src="<?php echo htmlspecialchars($notification->user->avatar); ?>" width="32px" height="32px"/></a></div>
                     </div>
                                     <?php
                                 break;
